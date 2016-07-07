@@ -3,8 +3,9 @@ package com.polidea.rxandroidble.internal;
 import android.support.annotation.IntDef;
 import android.util.Log;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.io.*;
+import java.util.Locale;
+import java.util.regex.*;
 
 /**
  * This file is a modification of Timber logging library -> https://github.com/JakeWharton/timber
@@ -25,6 +26,7 @@ public class RxBleLog {
     private static final Pattern ANONYMOUS_CLASS = Pattern.compile("\\$\\d+$");
     private static final ThreadLocal<String> NEXT_TAG = new ThreadLocal<>();
     private static int logLevel = Integer.MAX_VALUE;
+    private static File logDestination = null;
 
     private RxBleLog() {
 
@@ -32,6 +34,11 @@ public class RxBleLog {
 
     public static void setLogLevel(@LogLevel int logLevel) {
         RxBleLog.logLevel = logLevel;
+    }
+
+    public static void setLogLevelWithFile(@LogLevel int logLevel, File logDestination) {
+        RxBleLog.logLevel = logLevel;
+        RxBleLog.logDestination = logDestination;
     }
 
     private static String createTag() {
@@ -124,6 +131,9 @@ public class RxBleLog {
     private static void println(int priority, String tag, String message) {
         if (message.length() < 4000) {
             Log.println(priority, tag, message);
+            if (logDestination != null) {
+                writeToFile(logDestination, String.format(Locale.getDefault(), "%s %s", tag, message));
+            }
         } else {
             // It's rare that the message will be this large, so we're ok with the perf hit of splitting
             // and calling Log.println N times.  It's possible but unlikely that a single line will be
@@ -131,6 +141,26 @@ public class RxBleLog {
             String[] lines = message.split("\n");
             for (String line : lines) {
                 Log.println(priority, tag, line);
+                if (logDestination != null) {
+                    writeToFile(logDestination, String.format(Locale.getDefault(), "%s %s", tag, line));
+                }
+            }
+        }
+    }
+
+    private static void writeToFile(File file, String msg) {
+        OutputStreamWriter outputStreamWriter = null;
+        try {
+            outputStreamWriter = new OutputStreamWriter(new FileOutputStream(file, true));
+            outputStreamWriter.write(msg);
+            outputStreamWriter.write("\n");
+        } catch (IOException e) {
+        } finally {
+            if (outputStreamWriter != null) {
+                try {
+                    outputStreamWriter.close();
+                } catch (IOException e) {
+                }
             }
         }
     }
