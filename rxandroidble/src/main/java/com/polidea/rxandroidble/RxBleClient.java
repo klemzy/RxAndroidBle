@@ -3,13 +3,12 @@ package com.polidea.rxandroidble;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-
 import com.polidea.rxandroidble.internal.RxBleLog;
+import rx.Observable;
 
+import java.io.File;
 import java.util.Set;
 import java.util.UUID;
-
-import rx.Observable;
 
 public abstract class RxBleClient {
 
@@ -35,6 +34,10 @@ public abstract class RxBleClient {
      */
     public static void setLogLevel(@RxBleLog.LogLevel int logLevel) {
         RxBleLog.setLogLevel(logLevel);
+    }
+
+    public static void setLogLevelWithFile(@RxBleLog.LogLevel int logLevel, File file) {
+        RxBleLog.setLogLevelWithFile(logLevel, file);
     }
 
     /**
