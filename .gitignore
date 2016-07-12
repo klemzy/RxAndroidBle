@@ -3,3 +3,7 @@
 local.properties
 *.iml
 /build
+rxandroidble/gradlew
+rxandroidble/gradlew.bat
+rxandroidble/gradle/wrapper/gradle-wrapper.jar
+rxandroidble/gradle/wrapper/gradle-wrapper.properties
