@@ -1,5 +1,12 @@
 package com.polidea.rxandroidble.internal.connection;
 
+import android.bluetooth.*;
+import android.support.annotation.*;
+import com.polidea.rxandroidble.*;
+import com.polidea.rxandroidble.exceptions.*;
+import com.polidea.rxandroidble.internal.*;
+import com.polidea.rxandroidble.internal.operations.*;
+import com.polidea.rxandroidble.internal.util.*;
 import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattDescriptor;
@@ -39,10 +46,13 @@ import rx.functions.Actions;
 import rx.functions.Func0;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
+import rx.schedulers.*;
 
-import static android.bluetooth.BluetoothGattDescriptor.DISABLE_NOTIFICATION_VALUE;
-import static android.bluetooth.BluetoothGattDescriptor.ENABLE_INDICATION_VALUE;
-import static android.bluetooth.BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE;
+import java.util.*;
+import java.util.concurrent.*;
+import java.util.concurrent.atomic.*;
+
+import static android.bluetooth.BluetoothGattDescriptor.*;
 import static rx.Observable.error;
 import static rx.Observable.just;
 
@@ -113,8 +123,10 @@ public class RxBleConnectionImpl implements RxBleConnection {
             final List<BluetoothGattService> services = bluetoothGatt.getServices();
             final Observable<RxBleDeviceServices> newObservable;
             if (services.size() > 0) { // checking if bluetoothGatt has already discovered services (internal cache?)
+                RxBleLog.d("Returning cached services");
                 newObservable = just(new RxBleDeviceServices(services));
             } else { // performing actual discovery
+                RxBleLog.d("Performing service discovery");
                 newObservable = rxBleRadio
                         .queue(new RxBleRadioOperationServicesDiscover(
                                 gattCallback,
