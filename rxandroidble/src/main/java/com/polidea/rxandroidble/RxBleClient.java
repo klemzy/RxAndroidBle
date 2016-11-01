@@ -1,14 +1,13 @@
 package com.polidea.rxandroidble;
 
-import android.content.Context;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import com.polidea.rxandroidble.internal.RxBleLog;
+import android.content.*;
+import android.support.annotation.*;
+import com.polidea.rxandroidble.internal.*;
+import no.nordicsemi.android.support.v18.scanner.*;
 import rx.Observable;
 
-import java.io.File;
-import java.util.Set;
-import java.util.UUID;
+import java.io.*;
+import java.util.*;
 
 public abstract class RxBleClient {
 
@@ -55,8 +54,9 @@ public abstract class RxBleClient {
      * The library automatically handles Bluetooth adapter state changes but you are supposed to prompt
      * the user to enable it if it's disabled.
      *
-     * @param filterServiceUUIDs Filtering settings. Scan results are only filtered by exported services.
+     * @param filters Filtering settings. Scan results are only filtered by exported services.
+     * @param scanSettings Scan settings in order to set scan latency etc
      * @throws com.polidea.rxandroidble.exceptions.BleScanException emits in case of error starting the scan
      */
-    public abstract Observable<RxBleScanResult> scanBleDevices(@Nullable UUID... filterServiceUUIDs);
+    public abstract Observable<RxBleScanResult> scanBleDevices(List<ScanFilter> filters, ScanSettings scanSettings);
 }

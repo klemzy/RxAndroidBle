@@ -1,5 +1,16 @@
 package com.polidea.rxandroidble;
 
+import android.bluetooth.*;
+import android.content.*;
+import android.location.*;
+import android.support.annotation.*;
+import com.polidea.rxandroidble.RxBleAdapterStateObservable.*;
+import com.polidea.rxandroidble.exceptions.*;
+import com.polidea.rxandroidble.internal.*;
+import com.polidea.rxandroidble.internal.operations.*;
+import com.polidea.rxandroidble.internal.radio.*;
+import com.polidea.rxandroidble.internal.util.*;
+import no.nordicsemi.android.support.v18.scanner.*;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.Context;
@@ -36,13 +47,18 @@ import rx.Scheduler;
 import rx.functions.Action0;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
+import rx.*;
+import rx.schedulers.*;
+
+import java.util.*;
+import java.util.concurrent.*;
 
 class RxBleClientImpl extends RxBleClient {
 
     private final RxBleRadio rxBleRadio;
     private final UUIDUtil uuidUtil;
     private final RxBleDeviceProvider rxBleDeviceProvider;
-    private final Map<Set<UUID>, Observable<RxBleScanResult>> queuedScanOperations = new HashMap<>();
+    private final Map<Set<ScanFilter>, Observable<RxBleScanResult>> queuedScanOperations = new HashMap<>();
     private final RxBleAdapterWrapper rxBleAdapterWrapper;
     private final Observable<BleAdapterState> rxBleAdapterStateObservable;
     private final LocationServicesStatus locationServicesStatus;
@@ -118,7 +134,7 @@ class RxBleClientImpl extends RxBleClient {
     }
 
     @Override
-    public Observable<RxBleScanResult> scanBleDevices(@Nullable UUID... filterServiceUUIDs) {
+    public Observable<RxBleScanResult> scanBleDevices(List<ScanFilter> filters, ScanSettings scanSettings) {
 
         if (!rxBleAdapterWrapper.hasBluetoothAdapter()) {
             return Observable.error(new BleScanException(BleScanException.BLUETOOTH_NOT_AVAILABLE));
@@ -129,19 +145,19 @@ class RxBleClientImpl extends RxBleClient {
         } else if (!locationServicesStatus.isLocationProviderOk()) {
             return Observable.error(new BleScanException(BleScanException.LOCATION_SERVICES_DISABLED));
         } else {
-            return initializeScan(filterServiceUUIDs);
+            return initializeScan(filters, scanSettings);
         }
     }
 
-    private Observable<RxBleScanResult> initializeScan(@Nullable UUID[] filterServiceUUIDs) {
-        final Set<UUID> filteredUUIDs = uuidUtil.toDistinctSet(filterServiceUUIDs);
+    private Observable<RxBleScanResult> initializeScan(List<ScanFilter> filters, ScanSettings scanSettings) {
+        final Set<ScanFilter> filterSet = new HashSet<>(filters);
 
         synchronized (queuedScanOperations) {
-            Observable<RxBleScanResult> matchingQueuedScan = queuedScanOperations.get(filteredUUIDs);
+            Observable<RxBleScanResult> matchingQueuedScan = queuedScanOperations.get(filterSet);
 
             if (matchingQueuedScan == null) {
-                matchingQueuedScan = createScanOperation(filterServiceUUIDs);
-                queuedScanOperations.put(filteredUUIDs, matchingQueuedScan);
+                matchingQueuedScan = createScanOperation(filters, scanSettings);
+                queuedScanOperations.put(filterSet, matchingQueuedScan);
             }
 
             return matchingQueuedScan;
@@ -171,9 +187,9 @@ class RxBleClientImpl extends RxBleClient {
         return new RxBleScanResult(bleDevice, scanResult.getRssi(), scanResult.getScanRecord());
     }
 
-    private Observable<RxBleScanResult> createScanOperation(@Nullable final UUID[] filterServiceUUIDs) {
-        final Set<UUID> filteredUUIDs = uuidUtil.toDistinctSet(filterServiceUUIDs);
-        final RxBleRadioOperationScan scanOperation = new RxBleRadioOperationScan(filterServiceUUIDs, rxBleAdapterWrapper, uuidUtil);
+    private Observable<RxBleScanResult> createScanOperation(List<ScanFilter> filters, ScanSettings scanSettings) {
+        final Set<ScanFilter> filterSet = new HashSet<>(filters);
+        final RxBleRadioOperationScan scanOperation = new RxBleRadioOperationScan(rxBleAdapterWrapper, scanSettings, filters);
         return rxBleRadio.queue(scanOperation)
                 .doOnUnsubscribe(new Action0() {
                     @Override
@@ -181,7 +197,7 @@ class RxBleClientImpl extends RxBleClient {
 
                         synchronized (queuedScanOperations) {
                             scanOperation.stop();
-                            queuedScanOperations.remove(filteredUUIDs);
+                            queuedScanOperations.remove(filterSet);
                         }
                     }
                 })

@@ -46,6 +46,8 @@ dependencies {
     compile rootProject.ext.libs.rxandroid
     compile rootProject.ext.libs.support_annotations
 
+    compile 'no.nordicsemi.android.support.v18:scanner:0.2.0'
+
     // Test dependencies
     testCompile rootProject.ext.libs.junit
     testCompile rootProject.ext.libs.groovy
