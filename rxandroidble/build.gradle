@@ -51,6 +51,8 @@ dependencies {
     compile rootProject.ext.libs.dagger
     apt rootProject.ext.libs.dagger_compiler
 
+    compile 'no.nordicsemi.android.support.v18:scanner:0.2.0'
+
     // Test dependencies
     testCompile rootProject.ext.libs.junit
     testCompile rootProject.ext.libs.groovy
