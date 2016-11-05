@@ -135,6 +135,7 @@ public class RxBleConnectionImpl implements RxBleConnection {
                                 timeUnit,
                                 timeoutScheduler
                         ))
+                        .delaySubscription(5, TimeUnit.SECONDS)
                         .cacheWithInitialCapacity(1);
             }
 
