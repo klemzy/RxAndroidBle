@@ -1,10 +1,11 @@
 package com.polidea.rxandroidble.internal;
 
-import android.support.annotation.IntDef;
-import android.util.Log;
+import android.support.annotation.*;
+import android.util.*;
 
 import java.io.*;
-import java.util.Locale;
+import java.text.*;
+import java.util.*;
 import java.util.regex.*;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -158,7 +159,10 @@ public class RxBleLog {
         OutputStreamWriter outputStreamWriter = null;
         try {
             outputStreamWriter = new OutputStreamWriter(new FileOutputStream(file, true));
-            outputStreamWriter.write(msg);
+            long currentTime = System.currentTimeMillis();
+            SimpleDateFormat format = new SimpleDateFormat("HH:mm:ss dd/MM/yyyy", Locale.getDefault());
+            String message = String.format(Locale.getDefault(), "%s %s.", format.format(new Date(currentTime)), msg);
+            outputStreamWriter.write(message);
             outputStreamWriter.write("\n");
         } catch (IOException e) {
         } finally {
