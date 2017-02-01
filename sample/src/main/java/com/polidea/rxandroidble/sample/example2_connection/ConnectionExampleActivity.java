@@ -54,13 +54,13 @@ public class ConnectionExampleActivity extends RxAppCompatActivity {
 
     @OnClick(R.id.set_mtu)
     public void onSetMtu() {
-        bleDevice.establishConnection(this, false)
-                .flatMap(rxBleConnection -> rxBleConnection.requestMtu(72))
-                .first() // Disconnect automatically after discovery
-                .compose(bindUntilEvent(PAUSE))
-                .observeOn(AndroidSchedulers.mainThread())
-                .doOnUnsubscribe(this::updateUI)
-                .subscribe(this::onMtuReceived, this::onConnectionFailure);
+//        bleDevice.establishConnection(this, false)
+//                .flatMap(rxBleConnection -> rxBleConnection.requestMtu(72))
+//                .first() // Disconnect automatically after discovery
+//                .compose(bindUntilEvent(PAUSE))
+//                .observeOn(AndroidSchedulers.mainThread())
+//                .doOnUnsubscribe(this::updateUI)
+//                .subscribe(this::onMtuReceived, this::onConnectionFailure);
     }
 
     @Override
