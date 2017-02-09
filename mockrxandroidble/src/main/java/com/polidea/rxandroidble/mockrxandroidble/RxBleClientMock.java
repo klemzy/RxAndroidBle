@@ -277,7 +277,7 @@ public class RxBleClientMock extends RxBleClient {
     }
 
     @NonNull
-    private Observable<RxBleScanResult> createScanOperation(List<ScanFilter> filters) {
+    private Observable<RxBleScanResult> createScanOperation(final List<ScanFilter> filters) {
         return discoveredDevicesSubject
                 .filter(new Func1<RxBleDeviceMock, Boolean>() {
                     @Override
@@ -308,7 +308,7 @@ public class RxBleClientMock extends RxBleClient {
 
         for (ScanFilter filter: filters) {
 
-            if (!advertisedUUIDs.contains(filter.getServiceUuid().getUuid())) {{
+            if (!advertisedUUIDs.contains(filter.getServiceUuid().getUuid())) {
                 return false;
             }
         }
