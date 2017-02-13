@@ -1,10 +1,15 @@
 package com.polidea.rxandroidble.internal.util;
 
-import android.bluetooth.*;
-import android.support.annotation.*;
-import no.nordicsemi.android.support.v18.scanner.*;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
+import android.support.annotation.Nullable;
+import no.nordicsemi.android.support.v18.scanner.BluetoothLeScannerCompat;
+import no.nordicsemi.android.support.v18.scanner.ScanCallback;
+import no.nordicsemi.android.support.v18.scanner.ScanFilter;
+import no.nordicsemi.android.support.v18.scanner.ScanSettings;
 
-import java.util.*;
+import java.util.List;
+import java.util.Set;
 
 import javax.inject.Inject;
 

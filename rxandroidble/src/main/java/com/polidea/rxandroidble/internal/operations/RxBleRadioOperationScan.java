@@ -1,7 +1,5 @@
 package com.polidea.rxandroidble.internal.operations;
 
-import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
 import android.os.DeadObjectException;
 import com.polidea.rxandroidble.exceptions.BleException;
 import com.polidea.rxandroidble.exceptions.BleScanException;
@@ -9,16 +7,12 @@ import com.polidea.rxandroidble.internal.RxBleInternalScanResult;
 import com.polidea.rxandroidble.internal.RxBleLog;
 import com.polidea.rxandroidble.internal.RxBleRadioOperation;
 import com.polidea.rxandroidble.internal.util.RxBleAdapterWrapper;
-import com.polidea.rxandroidble.internal.util.UUIDUtil;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.UUID;
-import com.polidea.rxandroidble.exceptions.*;
-import com.polidea.rxandroidble.internal.*;
-import com.polidea.rxandroidble.internal.util.*;
-import no.nordicsemi.android.support.v18.scanner.*;
+import no.nordicsemi.android.support.v18.scanner.ScanCallback;
+import no.nordicsemi.android.support.v18.scanner.ScanFilter;
+import no.nordicsemi.android.support.v18.scanner.ScanResult;
+import no.nordicsemi.android.support.v18.scanner.ScanSettings;
 
-import java.util.*;
+import java.util.List;
 
 public class RxBleRadioOperationScan extends RxBleRadioOperation<RxBleInternalScanResult> {
 
@@ -33,7 +27,8 @@ public class RxBleRadioOperationScan extends RxBleRadioOperation<RxBleInternalSc
         public void onBatchScanResults(List<ScanResult> results) {
             super.onBatchScanResults(results);
             for (ScanResult result : results) {
-                RxBleRadioOperationScan.this.onNext(new RxBleInternalScanResult(result.getDevice(), result.getRssi(), result.getScanRecord().getBytes()));
+                RxBleRadioOperationScan.this.onNext(new RxBleInternalScanResult(result.getDevice(), result.getRssi(),
+                        result.getScanRecord().getBytes()));
             }
         }
 
@@ -46,11 +41,13 @@ public class RxBleRadioOperationScan extends RxBleRadioOperation<RxBleInternalSc
         @Override
         public void onScanResult(int callbackType, ScanResult result) {
             super.onScanResult(callbackType, result);
-            RxBleRadioOperationScan.this.onNext(new RxBleInternalScanResult(result.getDevice(), result.getRssi(), result.getScanRecord().getBytes()));
+            RxBleRadioOperationScan.this.onNext(new RxBleInternalScanResult(result.getDevice(), result.getRssi(),
+                    result.getScanRecord().getBytes()));
         }
     };
 
-    public RxBleRadioOperationScan(RxBleAdapterWrapper rxBleAdapterWrapper, ScanSettings scanSettings, List<ScanFilter> filters) {
+    public RxBleRadioOperationScan(RxBleAdapterWrapper rxBleAdapterWrapper, ScanSettings scanSettings,
+                                   List<ScanFilter> filters) {
         this.rxBleAdapterWrapper = rxBleAdapterWrapper;
         this.scanSettings = scanSettings;
         this.filters = filters;
@@ -60,16 +57,12 @@ public class RxBleRadioOperationScan extends RxBleRadioOperation<RxBleInternalSc
     protected void protectedRun() {
 
         try {
-            boolean startLeScanStatus = rxBleAdapterWrapper.startLeScan(filters, scanSettings, scanCallback);
+            rxBleAdapterWrapper.startLeScan(filters, scanSettings, scanCallback);
 
-            if (!startLeScanStatus) {
-                onError(new BleScanException(BleScanException.BLUETOOTH_CANNOT_START));
-            } else {
-                synchronized (this) { // synchronization added for stopping the scan
-                    isStarted = true;
-                    if (isStopped) {
-                        stop();
-                    }
+            synchronized (this) { // synchronization added for stopping the scan
+                isStarted = true;
+                if (isStopped) {
+                    stop();
                 }
             }
 
