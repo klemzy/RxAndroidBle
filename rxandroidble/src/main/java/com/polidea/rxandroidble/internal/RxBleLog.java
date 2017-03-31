@@ -1,14 +1,17 @@
 package com.polidea.rxandroidble.internal;
 
-import android.support.annotation.*;
-import android.util.*;
+import android.support.annotation.IntDef;
+import android.util.Log;
 
-import java.io.*;
-import java.text.*;
-import java.util.*;
-import java.util.regex.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -165,11 +168,13 @@ public class RxBleLog {
             outputStreamWriter.write(message);
             outputStreamWriter.write("\n");
         } catch (IOException e) {
+            e.printStackTrace();
         } finally {
             if (outputStreamWriter != null) {
                 try {
                     outputStreamWriter.close();
                 } catch (IOException e) {
+                    e.printStackTrace();
                 }
             }
         }

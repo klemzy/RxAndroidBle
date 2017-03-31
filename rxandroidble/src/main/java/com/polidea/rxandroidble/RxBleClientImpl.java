@@ -2,8 +2,6 @@ package com.polidea.rxandroidble;
 
 import android.bluetooth.BluetoothDevice;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-
 import com.polidea.rxandroidble.RxBleAdapterStateObservable.BleAdapterState;
 import com.polidea.rxandroidble.exceptions.BleScanException;
 import com.polidea.rxandroidble.internal.RxBleDeviceProvider;
@@ -13,20 +11,20 @@ import com.polidea.rxandroidble.internal.operations.RxBleRadioOperationScan;
 import com.polidea.rxandroidble.internal.util.LocationServicesStatus;
 import com.polidea.rxandroidble.internal.util.RxBleAdapterWrapper;
 import com.polidea.rxandroidble.internal.util.UUIDUtil;
-
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
-import java.util.concurrent.ExecutorService;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-
+import no.nordicsemi.android.support.v18.scanner.ScanFilter;
+import no.nordicsemi.android.support.v18.scanner.ScanSettings;
 import rx.Observable;
 import rx.functions.Action0;
 import rx.functions.Func1;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ExecutorService;
 
 class RxBleClientImpl extends RxBleClient {
 
@@ -34,7 +32,7 @@ class RxBleClientImpl extends RxBleClient {
     private final UUIDUtil uuidUtil;
     private final RxBleDeviceProvider rxBleDeviceProvider;
     private final ExecutorService executorService;
-    private final Map<Set<UUID>, Observable<RxBleScanResult>> queuedScanOperations = new HashMap<>();
+    private final Map<Set<ScanFilter>, Observable<RxBleScanResult>> queuedScanOperations = new HashMap<>();
     private final RxBleAdapterWrapper rxBleAdapterWrapper;
     private final Observable<BleAdapterState> rxBleAdapterStateObservable;
     private final LocationServicesStatus locationServicesStatus;
@@ -55,6 +53,7 @@ class RxBleClientImpl extends RxBleClient {
         this.rxBleDeviceProvider = rxBleDeviceProvider;
         this.executorService = executorService;
     }
+
     @Override
     protected void finalize() throws Throwable {
         super.finalize();

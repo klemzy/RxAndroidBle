@@ -7,19 +7,16 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.widget.Button;
 import android.widget.Toast;
-
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
 import com.polidea.rxandroidble.RxBleClient;
 import com.polidea.rxandroidble.RxBleScanResult;
 import com.polidea.rxandroidble.exceptions.BleScanException;
 import com.polidea.rxandroidble.sample.DeviceActivity;
 import com.polidea.rxandroidble.sample.R;
 import com.polidea.rxandroidble.sample.SampleApplication;
-
-import butterknife.BindView;
-import butterknife.ButterKnife;
-import butterknife.OnClick;
 import rx.Subscription;
-import rx.android.schedulers.AndroidSchedulers;
 
 public class ScanActivity extends AppCompatActivity {
 
@@ -46,10 +43,10 @@ public class ScanActivity extends AppCompatActivity {
         if (isScanning()) {
             scanSubscription.unsubscribe();
         } else {
-            scanSubscription = rxBleClient.scanBleDevices()
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .doOnUnsubscribe(this::clearSubscription)
-                    .subscribe(resultsAdapter::addScanResult, this::onScanFailure);
+//            scanSubscription = rxBleClient.scanBleDevices()
+//                    .observeOn(AndroidSchedulers.mainThread())
+//                    .doOnUnsubscribe(this::clearSubscription)
+//                    .subscribe(resultsAdapter::addScanResult, this::onScanFailure);
         }
 
         updateButtonUIState();
