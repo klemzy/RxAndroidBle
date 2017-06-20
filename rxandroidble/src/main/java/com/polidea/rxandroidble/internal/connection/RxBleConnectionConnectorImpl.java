@@ -46,7 +46,8 @@ public class RxBleConnectionConnectorImpl implements RxBleConnection.Connector {
     }
 
     @Override
-    public Observable<RxBleConnection> prepareConnection(final boolean autoConnect) {
+    public Observable<RxBleConnection> prepareConnection(final boolean autoConnect,
+                                                         final boolean refreshCache) {
         return Observable.defer(new Func0<Observable<RxBleConnection>>() {
             @Override
             public Observable<RxBleConnection> call() {
@@ -60,6 +61,11 @@ public class RxBleConnectionConnectorImpl implements RxBleConnection.Connector {
                         .setAutoConnect(autoConnect)
                         .build();
 
+                RxBleRadioOperationDisconnect operationDisconnect = connectionComponent
+                        .disconnectOperationBuilder()
+                        .setRefreshCache(refreshCache)
+                        .build();
+
                 return enqueueConnectOperation(operationConnect)
                         .flatMap(new Func1<BluetoothGatt, Observable<RxBleConnection>>() {
                             @Override
@@ -70,7 +76,7 @@ public class RxBleConnectionConnectorImpl implements RxBleConnection.Connector {
                                 );
                             }
                         })
-                        .doOnUnsubscribe(disconnect(connectionComponent.disconnectOperation()));
+                        .doOnUnsubscribe(disconnect(operationDisconnect));
             }
 
             @NonNull
@@ -100,6 +106,7 @@ public class RxBleConnectionConnectorImpl implements RxBleConnection.Connector {
             }
         });
     }
+
     private Observable<BleAdapterState> adapterNotUsableObservable() {
         return adapterStateObservable
                 .filter(new Func1<BleAdapterState, Boolean>() {

@@ -129,7 +129,7 @@ public class RxBleRadioOperationDisconnectTest extends Specification {
 
     private prepareObjectUnderTest() {
         objectUnderTest = new RxBleRadioOperationDisconnect(mockGattCallback, mockBluetoothGattProvider, mockMacAddress,
-                mockBluetoothManager, ImmediateScheduler.INSTANCE, new MockOperationTimeoutConfiguration(Schedulers.computation()))
+                mockBluetoothManager, ImmediateScheduler.INSTANCE, new MockOperationTimeoutConfiguration(Schedulers.computation()), refreshCache)
         objectUnderTest.setRadioBlockingSemaphore(mockSemaphore)
         objectUnderTest.asObservable().subscribe(testSubscriber)
     }

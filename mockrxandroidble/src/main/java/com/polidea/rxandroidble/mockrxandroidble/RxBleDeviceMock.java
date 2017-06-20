@@ -59,12 +59,14 @@ public class RxBleDeviceMock implements RxBleDevice {
 
     @Override
     @Deprecated
-    public Observable<RxBleConnection> establishConnection(Context context, boolean autoConnect) {
-        return establishConnection(autoConnect);
+    public Observable<RxBleConnection> establishConnection(Context context, boolean autoConnect,
+                                                           boolean refreshCache) {
+        return establishConnection(autoConnect, refreshCache);
     }
 
     @Override
-    public Observable<RxBleConnection> establishConnection(boolean autoConnect) {
+    public Observable<RxBleConnection> establishConnection(boolean autoConnect,
+                                                           boolean refreshCache) {
         return Observable.defer(new Func0<Observable<RxBleConnection>>() {
             @Override
             public Observable<RxBleConnection> call() {

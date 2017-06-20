@@ -29,7 +29,7 @@ public interface RxBleConnection {
 
     interface Connector {
 
-        Observable<RxBleConnection> prepareConnection(boolean autoConnect);
+        Observable<RxBleConnection> prepareConnection(boolean autoConnect, boolean refreshCache);
     }
 
     class RxBleConnectionState {

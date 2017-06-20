@@ -47,18 +47,18 @@ class RxBleDeviceImpl implements RxBleDevice {
 
     @Override
     @Deprecated
-    public Observable<RxBleConnection> establishConnection(Context context, boolean autoConnect) {
-        return establishConnection(autoConnect);
+    public Observable<RxBleConnection> establishConnection(Context context, boolean autoConnect, boolean refreshCache) {
+        return establishConnection(autoConnect, refreshCache);
     }
 
     @Override
-    public Observable<RxBleConnection> establishConnection(final boolean autoConnect) {
+    public Observable<RxBleConnection> establishConnection(final boolean autoConnect, final boolean refreshCache) {
         return Observable.defer(new Func0<Observable<RxBleConnection>>() {
             @Override
             public Observable<RxBleConnection> call() {
 
                 if (isConnected.compareAndSet(false, true)) {
-                    return connector.prepareConnection(autoConnect)
+                    return connector.prepareConnection(autoConnect, refreshCache)
                             .doOnSubscribe(new Action0() {
                                 @Override
                                 public void call() {

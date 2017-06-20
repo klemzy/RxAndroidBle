@@ -6,6 +6,10 @@ import android.support.annotation.Nullable
 import com.polidea.rxandroidble.exceptions.BleScanException
 import com.polidea.rxandroidble.internal.util.RxBleAdapterWrapper
 import com.polidea.rxandroidble.internal.util.UUIDUtil
+import no.nordicsemi.android.support.v18.scanner.ScanCallback
+import no.nordicsemi.android.support.v18.scanner.ScanFilter
+import no.nordicsemi.android.support.v18.scanner.ScanSettings
+
 import java.util.concurrent.Semaphore
 import java.util.concurrent.atomic.AtomicReference
 import rx.observers.TestSubscriber
@@ -172,14 +176,15 @@ public class RxBleRadioOperationScanTest extends Specification {
         }
 
         @Override
-        boolean startLeScan(BluetoothAdapter.LeScanCallback leScanCallback) {
+        void startLeScan(List<ScanFilter> filters, ScanSettings settings, ScanCallback scanCallback) {
+            super.startLeScan(filters, settings, scanCallback)
             acquireBeforeReturnStartScan.acquire()
             Thread.sleep(500)
-            return true
         }
 
         @Override
-        void stopLeScan(BluetoothAdapter.LeScanCallback leScanCallback) {
+        void stopLeScan(ScanCallback scanCallback) {
+            super.stopLeScan(scanCallback)
             numberOfTimesStopCalled++
         }
     }

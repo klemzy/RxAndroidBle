@@ -20,7 +20,7 @@ public interface ConnectionComponent {
     RxBleRadioOperationConnect.Builder connectOperationBuilder();
 
     @ConnectionScope
-    RxBleRadioOperationDisconnect disconnectOperation();
+    RxBleRadioOperationDisconnect.Builder disconnectOperationBuilder();
 
     @ConnectionScope
     RxBleConnection rxBleConnection();

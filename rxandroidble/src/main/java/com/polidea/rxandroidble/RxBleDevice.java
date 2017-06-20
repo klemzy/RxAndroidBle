@@ -41,10 +41,10 @@ public interface RxBleDevice {
      *                                         the code proxied from the Android system.
      * @throws BleGattCallbackTimeoutException emitted when an internal timeout for connection has been reached. The operation will
      *                                         timeout in direct mode (autoConnect = false) after 35 seconds.
-     * @see #establishConnection(boolean). The context is no longer required.
+     * @see #establishConnection(boolean, boolean). The context is no longer required.
      */
     @Deprecated
-    Observable<RxBleConnection> establishConnection(Context context, boolean autoConnect);
+    Observable<RxBleConnection> establishConnection(Context context, boolean autoConnect, boolean refreshCache);
 
     /**
      * Establishes connection with a given BLE device. {@link RxBleConnection} is a handle, used to process BLE operations with a connected
@@ -76,7 +76,7 @@ public interface RxBleDevice {
      * @throws BleGattCallbackTimeoutException emitted when an internal timeout for connection has been reached. The operation will
      *                                         timeout in direct mode (autoConnect = false) after 35 seconds.
      */
-    Observable<RxBleConnection> establishConnection(boolean autoConnect);
+    Observable<RxBleConnection> establishConnection(boolean autoConnect, boolean refreshCache);
 
     /**
      * Name of the device. Name is optional and it's up to the device vendor if will be provided.
