@@ -8,7 +8,7 @@ android {
     buildToolsVersion rootProject.ext.buildToolsVersionVariable
 
     defaultConfig {
-        minSdkVersion 19
+        minSdkVersion 21
         targetSdkVersion 25
         versionCode 1
         versionName VERSION_NAME
@@ -50,8 +50,6 @@ dependencies {
     compile rootProject.ext.libs.support_annotations
     compile rootProject.ext.libs.dagger
     apt rootProject.ext.libs.dagger_compiler
-
-    compile 'no.nordicsemi.android.support.v18:scanner:1.0.0'
 
     // Test dependencies
     testCompile rootProject.ext.libs.junit

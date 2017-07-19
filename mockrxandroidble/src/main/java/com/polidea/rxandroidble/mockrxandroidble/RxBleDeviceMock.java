@@ -59,14 +59,14 @@ public class RxBleDeviceMock implements RxBleDevice {
 
     @Override
     @Deprecated
-    public Observable<RxBleConnection> establishConnection(Context context, boolean autoConnect,
-                                                           boolean refreshCache) {
-        return establishConnection(autoConnect, refreshCache);
+    public Observable<RxBleConnection> establishConnection(Context context, boolean autoConnect) {
+        return establishConnection(autoConnect, false, -1);
     }
 
     @Override
     public Observable<RxBleConnection> establishConnection(boolean autoConnect,
-                                                           boolean refreshCache) {
+                                                           boolean refreshCache,
+                                                           int connectionPriority) {
         return Observable.defer(new Func0<Observable<RxBleConnection>>() {
             @Override
             public Observable<RxBleConnection> call() {
@@ -110,7 +110,6 @@ public class RxBleDeviceMock implements RxBleDevice {
     public RxBleConnection.RxBleConnectionState getConnectionState() {
         return observeConnectionStateChanges().toBlocking().first();
     }
-
     @Override
     public String getMacAddress() {
         return macAddress;

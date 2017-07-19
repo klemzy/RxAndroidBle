@@ -3,7 +3,6 @@ package com.polidea.rxandroidble.internal.operations
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothGatt
 import com.polidea.rxandroidble.RxBleConnection
-import com.polidea.rxandroidble.exceptions.BleGattCallbackTimeoutException
 import com.polidea.rxandroidble.internal.connection.BluetoothGattProvider
 import com.polidea.rxandroidble.internal.connection.RxBleGattCallback
 import com.polidea.rxandroidble.internal.util.BleConnectionCompat
@@ -51,7 +50,7 @@ public class RxBleRadioOperationConnectTest extends Specification {
 
     def prepareObjectUnderTest(boolean autoConnect) {
         objectUnderTest = new RxBleRadioOperationConnect(mockBluetoothDevice, mockBleConnectionCompat, mockCallback,
-                mockBluetoothGattProvider, timeoutConfiguration, autoConnect)
+                mockBluetoothGattProvider, timeoutConfiguration, autoConnect, connectionPriority)
         objectUnderTest.setRadioBlockingSemaphore(mockSemaphore)
         asObservableSubscription = objectUnderTest.asObservable().subscribe(testSubscriber)
     }

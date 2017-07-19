@@ -3,20 +3,22 @@ package com.polidea.rxandroidble.internal.operations;
 import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattService;
 import android.support.annotation.NonNull;
+
 import com.polidea.rxandroidble.RxBleDeviceServices;
 import com.polidea.rxandroidble.exceptions.BleGattCallbackTimeoutException;
 import com.polidea.rxandroidble.exceptions.BleGattOperationType;
 import com.polidea.rxandroidble.internal.RxBleSingleGattRadioOperation;
 import com.polidea.rxandroidble.internal.connection.RxBleGattCallback;
-import rx.Observable;
-import rx.Scheduler;
-import rx.functions.Func0;
-import rx.functions.Func1;
 
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+
+import rx.Observable;
+import rx.Scheduler;
+import rx.functions.Func0;
+import rx.functions.Func1;
 
 public class RxBleRadioOperationServicesDiscover extends RxBleSingleGattRadioOperation<RxBleDeviceServices> {
 
@@ -72,7 +74,7 @@ public class RxBleRadioOperationServicesDiscover extends RxBleSingleGattRadioOpe
                 the timeout was not triggered right in the moment of filling the services and then emit a value.
                  */
                     return Observable
-                            .timer(5, TimeUnit.SECONDS, timeoutScheduler)
+                            .timer(10, TimeUnit.SECONDS, timeoutScheduler)
                             .flatMap(new Func1<Long, Observable<RxBleDeviceServices>>() {
                                 @Override
                                 public Observable<RxBleDeviceServices> call(Long t) {

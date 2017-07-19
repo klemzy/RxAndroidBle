@@ -64,7 +64,7 @@ public class RxBleRadioOperationDisconnect extends RxBleRadioOperation<Void> {
 
         public RxBleRadioOperationDisconnect build() {
             return new RxBleRadioOperationDisconnect(rxBleGattCallback, bluetoothGattProvider,
-                    macAddress, bluetoothManager, mainThreadScheduler, timeoutConfiguration);
+                    macAddress, bluetoothManager, mainThreadScheduler, timeoutConfiguration, refreshCache);
         }
     }
 
@@ -83,13 +83,15 @@ public class RxBleRadioOperationDisconnect extends RxBleRadioOperation<Void> {
             @Named(DeviceModule.MAC_ADDRESS) String macAddress,
             BluetoothManager bluetoothManager,
             @Named(ClientComponent.NamedSchedulers.MAIN_THREAD) Scheduler mainThreadScheduler,
-            @Named(DeviceModule.DISCONNECT_TIMEOUT) TimeoutConfiguration timeoutConfiguration) {
+            @Named(DeviceModule.DISCONNECT_TIMEOUT) TimeoutConfiguration timeoutConfiguration,
+            boolean refreshCache) {
         this.rxBleGattCallback = rxBleGattCallback;
         this.bluetoothGattProvider = bluetoothGattProvider;
         this.macAddress = macAddress;
         this.bluetoothManager = bluetoothManager;
         this.mainThreadScheduler = mainThreadScheduler;
         this.timeoutConfiguration = timeoutConfiguration;
+        this.refreshCache = refreshCache;
     }
 
     @Override

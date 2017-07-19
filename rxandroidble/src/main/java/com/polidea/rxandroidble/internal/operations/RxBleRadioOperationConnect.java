@@ -2,6 +2,7 @@ package com.polidea.rxandroidble.internal.operations;
 
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGatt;
+import android.os.Build;
 import android.os.DeadObjectException;
 import android.support.annotation.NonNull;
 
@@ -40,6 +41,7 @@ public class RxBleRadioOperationConnect extends RxBleRadioOperation<BluetoothGat
         private final BluetoothGattProvider bluetoothGattProvider;
         private final TimeoutConfiguration connectTimeout;
         private boolean autoConnect = false;
+        private int connectionPriority = -1;
 
         @Inject
         public Builder(
@@ -60,9 +62,15 @@ public class RxBleRadioOperationConnect extends RxBleRadioOperation<BluetoothGat
             return this;
         }
 
+        public Builder setConnectionPriority(int connectionPriority) {
+            this.connectionPriority = connectionPriority;
+            return this;
+        }
+
         public RxBleRadioOperationConnect build() {
-            return new RxBleRadioOperationConnect(bluetoothDevice, connectionCompat, rxBleGattCallback, bluetoothGattProvider,
-                    connectTimeout, autoConnect);
+            return new RxBleRadioOperationConnect(bluetoothDevice, connectionCompat,
+                    rxBleGattCallback, bluetoothGattProvider,
+                    connectTimeout, autoConnect, connectionPriority);
         }
     }
 
@@ -72,6 +80,8 @@ public class RxBleRadioOperationConnect extends RxBleRadioOperation<BluetoothGat
     private final BluetoothGattProvider bluetoothGattProvider;
     private final TimeoutConfiguration connectTimeout;
     private final boolean autoConnect;
+    private final int connectionPriority;
+
     private final Runnable releaseRadioRunnable = new Runnable() {
         @Override
         public void run() {
@@ -108,13 +118,14 @@ public class RxBleRadioOperationConnect extends RxBleRadioOperation<BluetoothGat
             RxBleGattCallback rxBleGattCallback,
             BluetoothGattProvider bluetoothGattProvider,
             @Named(CONNECT_TIMEOUT) TimeoutConfiguration connectTimeout,
-            boolean autoConnect) {
+            boolean autoConnect, int connectionPriority) {
         this.bluetoothDevice = bluetoothDevice;
         this.connectionCompat = connectionCompat;
         this.rxBleGattCallback = rxBleGattCallback;
         this.bluetoothGattProvider = bluetoothGattProvider;
         this.connectTimeout = connectTimeout;
         this.autoConnect = autoConnect;
+        this.connectionPriority = connectionPriority;
     }
 
     @Override
@@ -205,7 +216,16 @@ public class RxBleRadioOperationConnect extends RxBleRadioOperation<BluetoothGat
                                 return rxBleConnectionState == CONNECTED;
                             }
                         }))
-                .take(1);
+                .take(1)
+                .doOnNext(new Action1<BluetoothGatt>() {
+                    @Override
+                    public void call(BluetoothGatt bluetoothGatt) {
+                        if (connectionPriority != -1 && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                            boolean result = bluetoothGatt.requestConnectionPriority(connectionPriority);
+                            RxBleLog.e("Connection priority set " + result);
+                        }
+                    }
+                });
     }
 
     @NonNull

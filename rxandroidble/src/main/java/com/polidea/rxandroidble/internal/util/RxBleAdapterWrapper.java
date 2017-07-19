@@ -2,11 +2,10 @@ package com.polidea.rxandroidble.internal.util;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.bluetooth.le.ScanCallback;
+import android.bluetooth.le.ScanFilter;
+import android.bluetooth.le.ScanSettings;
 import android.support.annotation.Nullable;
-import no.nordicsemi.android.support.v18.scanner.BluetoothLeScannerCompat;
-import no.nordicsemi.android.support.v18.scanner.ScanCallback;
-import no.nordicsemi.android.support.v18.scanner.ScanFilter;
-import no.nordicsemi.android.support.v18.scanner.ScanSettings;
 
 import java.util.List;
 import java.util.Set;
@@ -35,11 +34,11 @@ public class RxBleAdapterWrapper {
     }
 
     public void startLeScan(List<ScanFilter> filters, ScanSettings settings, ScanCallback scanCallback) {
-        BluetoothLeScannerCompat.getScanner().startScan(filters, settings, scanCallback);
+        bluetoothAdapter.getBluetoothLeScanner().startScan(filters, settings, scanCallback);
     }
 
     public void stopLeScan(ScanCallback scanCallback) {
-        BluetoothLeScannerCompat.getScanner().stopScan(scanCallback);
+        bluetoothAdapter.getBluetoothLeScanner().stopScan(scanCallback);
     }
 
     public Set<BluetoothDevice> getBondedDevices() {
