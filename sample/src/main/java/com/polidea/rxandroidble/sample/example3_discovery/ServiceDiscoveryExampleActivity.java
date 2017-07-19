@@ -1,5 +1,6 @@
 package com.polidea.rxandroidble.sample.example3_discovery;
 
+import android.bluetooth.BluetoothGatt;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
@@ -34,7 +35,7 @@ public class ServiceDiscoveryExampleActivity extends RxAppCompatActivity {
 
     @OnClick(R.id.connect)
     public void onConnectToggleClick() {
-        bleDevice.establishConnection(false, false)
+        bleDevice.establishConnection(false, false, BluetoothGatt.CONNECTION_PRIORITY_BALANCED)
                 .flatMap(RxBleConnection::discoverServices)
                 .first() // Disconnect automatically after discovery
                 .compose(bindUntilEvent(PAUSE))

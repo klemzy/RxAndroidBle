@@ -1,7 +1,10 @@
 package com.polidea.rxandroidble;
 
 import android.bluetooth.BluetoothDevice;
+import android.bluetooth.le.ScanFilter;
+import android.bluetooth.le.ScanSettings;
 import android.support.annotation.NonNull;
+
 import com.polidea.rxandroidble.RxBleAdapterStateObservable.BleAdapterState;
 import com.polidea.rxandroidble.exceptions.BleScanException;
 import com.polidea.rxandroidble.internal.RxBleDeviceProvider;
@@ -11,20 +14,20 @@ import com.polidea.rxandroidble.internal.operations.RxBleRadioOperationScan;
 import com.polidea.rxandroidble.internal.util.LocationServicesStatus;
 import com.polidea.rxandroidble.internal.util.RxBleAdapterWrapper;
 import com.polidea.rxandroidble.internal.util.UUIDUtil;
-import no.nordicsemi.android.support.v18.scanner.ScanFilter;
-import no.nordicsemi.android.support.v18.scanner.ScanSettings;
-import rx.Observable;
-import rx.functions.Action0;
-import rx.functions.Func1;
 
-import javax.inject.Inject;
-import javax.inject.Named;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+
+import rx.Observable;
+import rx.functions.Action0;
+import rx.functions.Func1;
 
 class RxBleClientImpl extends RxBleClient {
 

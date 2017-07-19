@@ -1,14 +1,28 @@
 package com.polidea.rxandroidble.mockrxandroidble;
 
-import android.bluetooth.*;
-import android.support.annotation.*;
-import com.polidea.rxandroidble.*;
-import no.nordicsemi.android.support.v18.scanner.*;
+import android.bluetooth.BluetoothGattCharacteristic;
+import android.bluetooth.BluetoothGattDescriptor;
+import android.bluetooth.BluetoothGattService;
+import android.bluetooth.le.ScanFilter;
+import android.bluetooth.le.ScanSettings;
+import android.support.annotation.NonNull;
+
+import com.polidea.rxandroidble.RxBleClient;
+import com.polidea.rxandroidble.RxBleDevice;
+import com.polidea.rxandroidble.RxBleDeviceServices;
+import com.polidea.rxandroidble.RxBleScanResult;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+
 import rx.Observable;
 import rx.functions.Func1;
 import rx.subjects.ReplaySubject;
-
-import java.util.*;
 
 /**
  * A mocked {@link RxBleClient}. Callers supply device parameters such as services,

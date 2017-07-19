@@ -1,5 +1,6 @@
 package com.polidea.rxandroidble.sample.example7_long_write;
 
+import android.bluetooth.BluetoothGatt;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.util.Pair;
@@ -46,7 +47,7 @@ public class LongWriteExampleActivity extends RxAppCompatActivity {
         final RxBleClient rxBleClient = SampleApplication.getRxBleClient(this);
 
         subscription = rxBleClient.getBleDevice(DUMMY_DEVICE_ADDRESS) // get our assumed device
-                .establishConnection(false, false) // establish the connection
+                .establishConnection(false, false, BluetoothGatt.CONNECTION_PRIORITY_BALANCED) // establish the connection
                 .flatMap(rxBleConnection -> Observable.combineLatest(
                         // after establishing the connection lets setup the notifications
                         rxBleConnection.setupNotification(DEVICE_CALLBACK_0),

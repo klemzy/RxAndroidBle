@@ -70,7 +70,7 @@ public class CustomOperationExampleActivity extends RxAppCompatActivity {
 
     private Observable<RxBleConnection> prepareConnectionObservable() {
         return bleDevice
-                .establishConnection(false, false)
+                .establishConnection(false, false, BluetoothGatt.CONNECTION_PRIORITY_BALANCED)
                 .takeUntil(disconnectTriggerSubject)
                 .compose(bindUntilEvent(PAUSE))
                 .doOnUnsubscribe(this::clearSubscription)

@@ -1,15 +1,17 @@
 package com.polidea.rxandroidble;
 
+import android.bluetooth.le.ScanFilter;
+import android.bluetooth.le.ScanSettings;
 import android.content.Context;
 import android.support.annotation.NonNull;
+
 import com.polidea.rxandroidble.internal.RxBleLog;
-import no.nordicsemi.android.support.v18.scanner.ScanFilter;
-import no.nordicsemi.android.support.v18.scanner.ScanSettings;
-import rx.Observable;
 
 import java.io.File;
 import java.util.List;
 import java.util.Set;
+
+import rx.Observable;
 
 public abstract class RxBleClient {
 

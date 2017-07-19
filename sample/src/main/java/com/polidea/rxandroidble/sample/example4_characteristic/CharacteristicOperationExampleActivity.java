@@ -1,5 +1,6 @@
 package com.polidea.rxandroidble.sample.example4_characteristic;
 
+import android.bluetooth.BluetoothGatt;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.util.Log;
@@ -63,7 +64,7 @@ public class CharacteristicOperationExampleActivity extends RxAppCompatActivity 
 
     private Observable<RxBleConnection> prepareConnectionObservable() {
         return bleDevice
-                .establishConnection(false, false)
+                .establishConnection(false, false, BluetoothGatt.CONNECTION_PRIORITY_BALANCED)
                 .takeUntil(disconnectTriggerSubject)
                 .compose(bindUntilEvent(PAUSE))
                 .doOnUnsubscribe(this::clearSubscription)

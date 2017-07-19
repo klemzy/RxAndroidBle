@@ -1,5 +1,6 @@
 package com.polidea.rxandroidble.sample.example5_rssi_periodic;
 
+import android.bluetooth.BluetoothGatt;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.widget.Button;
@@ -40,7 +41,7 @@ public class RssiPeriodicExampleActivity extends RxAppCompatActivity {
         if (isConnected()) {
             triggerDisconnect();
         } else {
-            connectionSubscription = bleDevice.establishConnection(false, false)
+            connectionSubscription = bleDevice.establishConnection(false, false, BluetoothGatt.CONNECTION_PRIORITY_BALANCED)
                     .compose(bindUntilEvent(PAUSE))
                     .observeOn(AndroidSchedulers.mainThread())
                     .doOnUnsubscribe(this::clearSubscription)

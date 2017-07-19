@@ -1,5 +1,6 @@
 package com.polidea.rxandroidble.sample.example2_connection;
 
+import android.bluetooth.BluetoothGatt;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v7.widget.SwitchCompat;
@@ -45,7 +46,7 @@ public class ConnectionExampleActivity extends RxAppCompatActivity {
             triggerDisconnect();
         } else {
             connectionSubscription = bleDevice.establishConnection(autoConnectToggleSwitch.isChecked()
-                    , false)
+                    , false, BluetoothGatt.CONNECTION_PRIORITY_BALANCED)
                     .compose(bindUntilEvent(PAUSE))
                     .observeOn(AndroidSchedulers.mainThread())
                     .doOnUnsubscribe(this::clearSubscription)
@@ -55,7 +56,7 @@ public class ConnectionExampleActivity extends RxAppCompatActivity {
 
     @OnClick(R.id.set_mtu)
     public void onSetMtu() {
-        bleDevice.establishConnection(false, false)
+        bleDevice.establishConnection(false, false, BluetoothGatt.CONNECTION_PRIORITY_BALANCED)
                 .flatMap(rxBleConnection -> rxBleConnection.requestMtu(72))
                 .first() // Disconnect automatically after discovery
                 .compose(bindUntilEvent(PAUSE))
