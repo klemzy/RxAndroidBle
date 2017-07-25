@@ -1,49 +1,41 @@
 package com.polidea.rxandroidble.internal.connection;
 
 import android.bluetooth.BluetoothGatt;
+
 import com.polidea.rxandroidble.RxBleConnection;
 import com.polidea.rxandroidble.internal.operations.OperationsProvider;
 import com.polidea.rxandroidble.internal.operations.OperationsProviderImpl;
-import dagger.Module;
-import dagger.Provides;
-import java.util.concurrent.Callable;
+
+import dagger.Binds;
 import javax.inject.Named;
 
+import dagger.Module;
+import dagger.Provides;
+
 @Module
-public class ConnectionModule {
+abstract public class ConnectionModule {
 
-    public static final String CURRENT_MTU = "current-mtu";
-
-    @Provides
-    @Named(CURRENT_MTU)
-    Callable<Integer> provideCurrentMtuProvider(final RxBleConnectionImpl rxBleConnection) {
-        return new Callable<Integer>() {
-            @Override
-            public Integer call() throws Exception {
-                return rxBleConnection.currentMtu;
-            }
-        };
-    }
+    static final String GATT_WRITE_MTU_OVERHEAD = "GATT_WRITE_MTU_OVERHEAD";
 
     @Provides
-    RxBleConnection.LongWriteOperationBuilder provideLongWriteOperationBuilder(LongWriteOperationBuilderImpl operationBuilder) {
-        return operationBuilder;
-    }
-
-    @Provides
-    OperationsProvider provideOperationsProvider(OperationsProviderImpl operationsProvider) {
-        return operationsProvider;
+    @Named(GATT_WRITE_MTU_OVERHEAD)
+    static int gattWriteMtuOverhead() {
+        return RxBleConnection.GATT_WRITE_MTU_OVERHEAD;
     }
 
     @Provides
     @ConnectionScope
-    RxBleConnection provideRxBleConnection(RxBleConnectionImpl rxBleConnection) {
-        return rxBleConnection;
-    }
-
-    @Provides
-    @ConnectionScope
-    BluetoothGatt provideBluetoothGatt(BluetoothGattProvider bluetoothGattProvider) {
+    static BluetoothGatt provideBluetoothGatt(BluetoothGattProvider bluetoothGattProvider) {
         return bluetoothGattProvider.getBluetoothGatt();
     }
+
+    @Binds
+    abstract RxBleConnection.LongWriteOperationBuilder bindLongWriteOperationBuilder(LongWriteOperationBuilderImpl operationBuilder);
+
+    @Binds
+    abstract OperationsProvider bindOperationsProvider(OperationsProviderImpl operationsProvider);
+
+    @Binds
+    @ConnectionScope
+    abstract RxBleConnection bindRxBleConnection(RxBleConnectionImpl rxBleConnection);
 }

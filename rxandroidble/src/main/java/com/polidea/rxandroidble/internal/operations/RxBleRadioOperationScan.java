@@ -1,87 +1,52 @@
 package com.polidea.rxandroidble.internal.operations;
 
-import android.bluetooth.le.ScanCallback;
-import android.bluetooth.le.ScanFilter;
-import android.bluetooth.le.ScanResult;
-import android.bluetooth.le.ScanSettings;
 import android.os.DeadObjectException;
-
 import com.polidea.rxandroidble.exceptions.BleException;
 import com.polidea.rxandroidble.exceptions.BleScanException;
-import com.polidea.rxandroidble.internal.RxBleInternalScanResult;
+import com.polidea.rxandroidble.internal.RadioReleaseInterface;
 import com.polidea.rxandroidble.internal.RxBleLog;
 import com.polidea.rxandroidble.internal.RxBleRadioOperation;
 import com.polidea.rxandroidble.internal.util.RxBleAdapterWrapper;
+import rx.Emitter;
+import rx.functions.Cancellable;
 
-import java.util.List;
-
-public class RxBleRadioOperationScan extends RxBleRadioOperation<RxBleInternalScanResult> {
+/**
+ * A class that handles starting and stopping BLE scans.
+ *
+ * @param <SCAN_RESULT_TYPE>   Type of the objects that the RxBleRadioOperation should emit
+ * @param <SCAN_CALLBACK_TYPE> Type of the BLE scan callback used by a particular implementation
+ */
+abstract public class RxBleRadioOperationScan<SCAN_RESULT_TYPE, SCAN_CALLBACK_TYPE> extends RxBleRadioOperation<SCAN_RESULT_TYPE> {
 
     private final RxBleAdapterWrapper rxBleAdapterWrapper;
-    private final ScanSettings scanSettings;
-    private final List<ScanFilter> filters;
-    private volatile boolean isStarted = false;
-    private volatile boolean isStopped = false;
 
-    private final ScanCallback scanCallback = new ScanCallback() {
-        @Override
-        public void onBatchScanResults(List<ScanResult> results) {
-            super.onBatchScanResults(results);
-            for (ScanResult result : results) {
-                RxBleRadioOperationScan.this.onNext(new RxBleInternalScanResult(result.getDevice(), result.getRssi(),
-                        result.getScanRecord().getBytes()));
-            }
-        }
-
-        @Override
-        public void onScanFailed(int errorCode) {
-            super.onScanFailed(errorCode);
-            RxBleRadioOperationScan.this.onError(new BleScanException(BleScanException.BLUETOOTH_CANNOT_START));
-        }
-
-        @Override
-        public void onScanResult(int callbackType, ScanResult result) {
-            super.onScanResult(callbackType, result);
-            RxBleRadioOperationScan.this.onNext(new RxBleInternalScanResult(result.getDevice(), result.getRssi(),
-                    result.getScanRecord().getBytes()));
-        }
-    };
-
-    public RxBleRadioOperationScan(RxBleAdapterWrapper rxBleAdapterWrapper, ScanSettings scanSettings,
-                                   List<ScanFilter> filters) {
+    RxBleRadioOperationScan(RxBleAdapterWrapper rxBleAdapterWrapper) {
         this.rxBleAdapterWrapper = rxBleAdapterWrapper;
-        this.scanSettings = scanSettings;
-        this.filters = filters;
     }
 
     @Override
-    protected void protectedRun() {
+    final protected void protectedRun(final Emitter<SCAN_RESULT_TYPE> emitter, RadioReleaseInterface radioReleaseInterface) {
+
+        final SCAN_CALLBACK_TYPE scanCallback = createScanCallback(emitter);
 
         try {
-            rxBleAdapterWrapper.startLeScan(filters, scanSettings, scanCallback);
-
-            synchronized (this) { // synchronization added for stopping the scan
-                isStarted = true;
-                if (isStopped) {
-                    stop();
+            emitter.setCancellation(new Cancellable() {
+                @Override
+                public void cancel() throws Exception {
+                    stopScan(rxBleAdapterWrapper, scanCallback);
                 }
+            });
+
+            boolean startLeScanStatus = startScan(rxBleAdapterWrapper, scanCallback);
+
+            if (!startLeScanStatus) {
+                emitter.onError(new BleScanException(BleScanException.BLUETOOTH_CANNOT_START));
             }
-
         } catch (Throwable throwable) {
-            isStarted = true;
-            RxBleLog.e(throwable, "Error while calling BluetoothAdapter.startLeScan()");
-            onError(new BleScanException(BleScanException.BLUETOOTH_CANNOT_START));
+            RxBleLog.e(throwable, "Error while calling the start scan function");
+            emitter.onError(new BleScanException(BleScanException.BLUETOOTH_CANNOT_START));
         } finally {
-            releaseRadio();
-        }
-    }
-
-    // synchronized keyword added to be sure that operation will be stopped no matter which thread will call it
-    public synchronized void stop() {
-        isStopped = true;
-        if (isStarted) {
-            // TODO: [PU] 29.01.2016 https://code.google.com/p/android/issues/detail?id=160503
-            rxBleAdapterWrapper.stopLeScan(scanCallback);
+            radioReleaseInterface.release();
         }
     }
 
@@ -89,4 +54,30 @@ public class RxBleRadioOperationScan extends RxBleRadioOperation<RxBleInternalSc
     protected BleException provideException(DeadObjectException deadObjectException) {
         return new BleScanException(BleScanException.BLUETOOTH_DISABLED, deadObjectException);
     }
+
+    /**
+     * Function that should return a scan callback of a proper type. The returned scan callback will later be passed
+     * to {@link #startScan(RxBleAdapterWrapper, Object)} and {@link #stopScan(RxBleAdapterWrapper, Object)}
+     *
+     * @param emitter the emitter for notifications
+     * @return the scan callback type to use with {@link #startScan(RxBleAdapterWrapper, Object)}
+     * and {@link #stopScan(RxBleAdapterWrapper, Object)}
+     */
+    abstract SCAN_CALLBACK_TYPE createScanCallback(Emitter<SCAN_RESULT_TYPE> emitter);
+
+    /**
+     * Function that should start the scan using passed {@link RxBleAdapterWrapper} and {@link SCAN_CALLBACK_TYPE} callback
+     * @param rxBleAdapterWrapper the {@link RxBleAdapterWrapper} to use
+     * @param scanCallback the {@link SCAN_CALLBACK_TYPE} returned by {@link #createScanCallback(Emitter)} to start
+     * @return true if successful
+     */
+    abstract boolean startScan(RxBleAdapterWrapper rxBleAdapterWrapper, SCAN_CALLBACK_TYPE scanCallback);
+
+    /**
+     * Method that should stop the scan for a given {@link SCAN_CALLBACK_TYPE} that was previously returned
+     * by {@link #createScanCallback(Emitter)}
+     * @param rxBleAdapterWrapper the {@link RxBleAdapterWrapper} to use
+     * @param scanCallback the {@link SCAN_CALLBACK_TYPE} returned by {@link #createScanCallback(Emitter)} to stop
+     */
+    abstract void stopScan(RxBleAdapterWrapper rxBleAdapterWrapper, SCAN_CALLBACK_TYPE scanCallback);
 }

@@ -9,9 +9,9 @@ import android.support.annotation.RequiresApi;
 import com.polidea.rxandroidble.ClientComponent;
 import com.polidea.rxandroidble.RxBleConnection;
 import com.polidea.rxandroidble.internal.DeviceModule;
+import com.polidea.rxandroidble.internal.connection.PayloadSizeLimitProvider;
 import com.polidea.rxandroidble.internal.connection.RxBleGattCallback;
 
-import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
@@ -49,7 +49,7 @@ public class OperationsProviderImpl implements OperationsProvider {
     public RxBleRadioOperationCharacteristicLongWrite provideLongWriteOperation(
             BluetoothGattCharacteristic bluetoothGattCharacteristic,
             RxBleConnection.WriteOperationAckStrategy writeOperationAckStrategy,
-            Callable<Integer> maxBatchSizeCallable,
+            PayloadSizeLimitProvider maxBatchSizeProvider,
             byte[] bytes) {
 
         return new RxBleRadioOperationCharacteristicLongWrite(bluetoothGatt,
@@ -57,7 +57,7 @@ public class OperationsProviderImpl implements OperationsProvider {
                 mainThreadScheduler,
                 timeoutConfiguration,
                 bluetoothGattCharacteristic,
-                maxBatchSizeCallable,
+                maxBatchSizeProvider,
                 writeOperationAckStrategy,
                 bytes);
     }
@@ -98,5 +98,14 @@ public class OperationsProviderImpl implements OperationsProvider {
     public RxBleRadioOperationDescriptorWrite provideWriteDescriptor(BluetoothGattDescriptor bluetoothGattDescriptor, byte[] data) {
         return new RxBleRadioOperationDescriptorWrite(rxBleGattCallback, bluetoothGatt, timeoutConfiguration,
                 BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT, bluetoothGattDescriptor, data);
+    }
+
+    @Override
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+    public RxBleRadioOperationConnectionPriorityRequest provideConnectionPriorityChangeOperation(int connectionPriority,
+                                                                                                 long delay,
+                                                                                                 TimeUnit timeUnit) {
+        return new RxBleRadioOperationConnectionPriorityRequest(rxBleGattCallback, bluetoothGatt, timeoutConfiguration,
+                connectionPriority, delay, timeUnit, timeoutScheduler);
     }
 }

@@ -3,9 +3,7 @@ package com.polidea.rxandroidble
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
 import com.polidea.rxandroidble.internal.util.RxBleAdapterWrapper
-import no.nordicsemi.android.support.v18.scanner.ScanCallback
-import no.nordicsemi.android.support.v18.scanner.ScanFilter
-import no.nordicsemi.android.support.v18.scanner.ScanSettings
+import org.apache.maven.artifact.versioning.OverConstrainedVersionException
 
 class MockRxBleAdapterWrapper extends RxBleAdapterWrapper {
 
@@ -48,18 +46,15 @@ class MockRxBleAdapterWrapper extends RxBleAdapterWrapper {
     }
 
     @Override
-    void startLeScan(List<ScanFilter> filters, ScanSettings settings, ScanCallback scanCallback) {
-        super.startLeScan(filters, settings, scanCallback)
+    boolean startLegacyLeScan(BluetoothAdapter.LeScanCallback callback) {
+
         scanDataList.each {
             callback.onLeScan(it.device, it.rssi, it.scanRecord)
         }
+
+        return true
     }
 
-    @Override
-    void stopLeScan(ScanCallback scanCallback) {
-        super.stopLeScan(scanCallback)
-    }
-    
     @Override
     boolean hasBluetoothAdapter() {
         return true
@@ -68,6 +63,11 @@ class MockRxBleAdapterWrapper extends RxBleAdapterWrapper {
     @Override
     boolean isBluetoothEnabled() {
         return true
+    }
+
+    @Override
+    void stopLegacyLeScan(BluetoothAdapter.LeScanCallback leScanCallback) {
+
     }
 
     @Override

@@ -3,15 +3,15 @@ package com.polidea.rxandroidble.mockrxandroidble;
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattDescriptor;
 import android.bluetooth.BluetoothGattService;
-import android.bluetooth.le.ScanFilter;
-import android.bluetooth.le.ScanSettings;
 import android.support.annotation.NonNull;
-
+import android.support.annotation.Nullable;
 import com.polidea.rxandroidble.RxBleClient;
 import com.polidea.rxandroidble.RxBleDevice;
 import com.polidea.rxandroidble.RxBleDeviceServices;
 import com.polidea.rxandroidble.RxBleScanResult;
-
+import com.polidea.rxandroidble.scan.ScanFilter;
+import com.polidea.rxandroidble.scan.ScanResult;
+import com.polidea.rxandroidble.scan.ScanSettings;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -19,7 +19,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-
 import rx.Observable;
 import rx.functions.Func1;
 import rx.subjects.ReplaySubject;
@@ -282,8 +281,8 @@ public class RxBleClientMock extends RxBleClient {
     }
 
     @Override
-    public Observable<RxBleScanResult> scanBleDevices(List<ScanFilter> filters, ScanSettings scanSettings) {
-        return createScanOperation(filters);
+    public Observable<RxBleScanResult> scanBleDevices(@Nullable UUID... filterServiceUUIDs) {
+        return createScanOperation(filterServiceUUIDs);
     }
 
     private RxBleScanResult convertToPublicScanResult(RxBleDevice bleDevice, Integer rssi, byte[] scanRecord) {
@@ -291,12 +290,12 @@ public class RxBleClientMock extends RxBleClient {
     }
 
     @NonNull
-    private Observable<RxBleScanResult> createScanOperation(final List<ScanFilter> filters) {
+    private Observable<RxBleScanResult> createScanOperation(@Nullable final UUID[] filterServiceUUIDs) {
         return discoveredDevicesSubject
                 .filter(new Func1<RxBleDeviceMock, Boolean>() {
                     @Override
                     public Boolean call(RxBleDeviceMock rxBleDevice) {
-                        return RxBleClientMock.this.filterDevice(rxBleDevice, filters);
+                        return RxBleClientMock.this.filterDevice(rxBleDevice, filterServiceUUIDs);
                     }
                 })
                 .map(new Func1<RxBleDeviceMock, RxBleScanResult>() {
@@ -312,21 +311,36 @@ public class RxBleClientMock extends RxBleClient {
         return convertToPublicScanResult(rxBleDeviceMock, rxBleDeviceMock.getRssi(), rxBleDeviceMock.getScanRecord());
     }
 
-    private boolean filterDevice(RxBleDevice rxBleDevice, List<ScanFilter> filters) {
+    private boolean filterDevice(RxBleDevice rxBleDevice, @Nullable UUID[] filterServiceUUIDs) {
 
-        if (filters == null || filters.size() == 0) {
+        if (filterServiceUUIDs == null || filterServiceUUIDs.length == 0) {
             return true;
         }
 
         List<UUID> advertisedUUIDs = ((RxBleDeviceMock) rxBleDevice).getAdvertisedUUIDs();
 
-        for (ScanFilter filter: filters) {
+        for (UUID desiredUUID : filterServiceUUIDs) {
 
-            if (!advertisedUUIDs.contains(filter.getServiceUuid().getUuid())) {
+            if (!advertisedUUIDs.contains(desiredUUID)) {
                 return false;
             }
         }
 
         return true;
+    }
+
+    @Override
+    public Observable<ScanResult> scanBleDevices(ScanSettings scanSettings, ScanFilter... scanFilters) {
+        return Observable.error(new RuntimeException("not implemented")); // TODO [DS]
+    }
+
+    @Override
+    public Observable<State> observeStateChanges() {
+        return Observable.just(State.READY);
+    }
+
+    @Override
+    public State getState() {
+        return State.READY;
     }
 }
