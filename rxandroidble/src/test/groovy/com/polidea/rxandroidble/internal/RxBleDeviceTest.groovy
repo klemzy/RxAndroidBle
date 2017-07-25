@@ -23,7 +23,8 @@ public class RxBleDeviceTest extends Specification {
     RxBleConnection mockConnection = Mock RxBleConnection
     PublishSubject<RxBleConnection> mockConnectorEstablishConnectionPublishSubject = PublishSubject.create()
     PublishSubject<RxBleConnection.RxBleConnectionState> connectionStatePublishSubject = PublishSubject.create()
-    @Shared BluetoothGatt mockBluetoothGatt = Mock BluetoothGatt
+    @Shared
+    BluetoothGatt mockBluetoothGatt = Mock BluetoothGatt
     RxBleDevice rxBleDevice = new RxBleDeviceImpl(mockBluetoothDevice, mockConnector)
     TestSubscriber deviceConnectionStateSubscriber = new TestSubscriber()
 
@@ -71,7 +72,7 @@ public class RxBleDeviceTest extends Specification {
     def "establishConnection() should call RxBleConnection.Connector.prepareConnection() #id"() {
 
         when:
-        rxBleDevice.establishConnection(theAutoConnectValue).subscribe()
+        rxBleDevice.establishConnection(theAutoConnectValue, false).subscribe()
 
         then:
         1 * mockConnector.prepareConnection(theAutoConnectValue) >> connectionStatePublishSubject
@@ -232,7 +233,7 @@ public class RxBleDeviceTest extends Specification {
         subscription.unsubscribe()
 
         when:
-        rxBleDevice.establishConnection(false).subscribe(secondSubscriber)
+        rxBleDevice.establishConnection(false, false).subscribe(secondSubscriber)
 
         then:
         firstSubscriber.assertValueCount 1
@@ -311,7 +312,7 @@ public class RxBleDeviceTest extends Specification {
     }
 
     public Observable<RxBleConnection> rxStartConnecting() {
-        return rxBleDevice.establishConnection(false, false, BluetoothGatt.CONNECTION_PRIORITY_BALANCED)
+        return rxBleDevice.establishConnection(false, false)
     }
 
     public void notifyConnectionWasEstablished() {

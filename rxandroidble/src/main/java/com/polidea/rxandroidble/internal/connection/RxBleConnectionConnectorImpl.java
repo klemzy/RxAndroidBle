@@ -47,8 +47,7 @@ public class RxBleConnectionConnectorImpl implements RxBleConnection.Connector {
 
     @Override
     public Observable<RxBleConnection> prepareConnection(final boolean autoConnect,
-                                                         final boolean refreshCache,
-                                                         final int connectionPriority) {
+                                                         final boolean refreshCache) {
         return Observable.defer(new Func0<Observable<RxBleConnection>>() {
             @Override
             public Observable<RxBleConnection> call() {
@@ -60,7 +59,6 @@ public class RxBleConnectionConnectorImpl implements RxBleConnection.Connector {
                 final ConnectionComponent connectionComponent = connectionComponentBuilder.build();
                 RxBleRadioOperationConnect operationConnect = connectionComponent.connectOperationBuilder()
                         .setAutoConnect(autoConnect)
-                        .setConnectionPriority(connectionPriority)
                         .build();
 
                 RxBleRadioOperationDisconnect operationDisconnect = connectionComponent

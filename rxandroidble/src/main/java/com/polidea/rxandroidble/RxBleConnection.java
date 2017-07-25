@@ -70,8 +70,7 @@ public interface RxBleConnection {
 
     interface Connector {
 
-        Observable<RxBleConnection> prepareConnection(boolean autoConnect, boolean refreshCache,
-                                                      int connectionPriority);
+        Observable<RxBleConnection> prepareConnection(boolean autoConnect, boolean refreshCache);
     }
 
     enum RxBleConnectionState {
