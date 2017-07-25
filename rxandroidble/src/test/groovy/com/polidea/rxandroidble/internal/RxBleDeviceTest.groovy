@@ -1,7 +1,7 @@
 package com.polidea.rxandroidble.internal
+
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothGatt
-import android.content.Context
 import com.polidea.rxandroidble.RxBleConnection
 import com.polidea.rxandroidble.RxBleDevice
 import com.polidea.rxandroidble.exceptions.BleAlreadyConnectedException
@@ -311,7 +311,7 @@ public class RxBleDeviceTest extends Specification {
     }
 
     public Observable<RxBleConnection> rxStartConnecting() {
-        return rxBleDevice.establishConnection(false)
+        return rxBleDevice.establishConnection(false, false, BluetoothGatt.CONNECTION_PRIORITY_BALANCED)
     }
 
     public void notifyConnectionWasEstablished() {

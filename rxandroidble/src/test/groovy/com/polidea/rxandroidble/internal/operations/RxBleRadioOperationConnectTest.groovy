@@ -51,7 +51,7 @@ public class RxBleRadioOperationConnectTest extends Specification {
 
     def prepareObjectUnderTest(boolean autoConnect) {
         objectUnderTest = new RxBleRadioOperationConnect(mockBluetoothDevice, mockBleConnectionCompat, mockCallback,
-                mockBluetoothGattProvider, timeoutConfiguration, autoConnect)
+                mockBluetoothGattProvider, timeoutConfiguration, autoConnect, BluetoothGatt.CONNECTION_PRIORITY_BALANCED)
     }
 
     def "asObservable() should not emit onNext before connection is established"() {

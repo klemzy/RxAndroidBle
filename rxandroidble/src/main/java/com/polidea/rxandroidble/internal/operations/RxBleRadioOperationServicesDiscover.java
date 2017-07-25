@@ -74,7 +74,7 @@ public class RxBleRadioOperationServicesDiscover extends RxBleSingleGattRadioOpe
                 the timeout was not triggered right in the moment of filling the services and then emit a value.
                  */
                     return Observable
-                            .timer(10, TimeUnit.SECONDS, timeoutScheduler)
+                            .timer(5, TimeUnit.SECONDS, timeoutScheduler)
                             .flatMap(new Func1<Long, Observable<RxBleDeviceServices>>() {
                                 @Override
                                 public Observable<RxBleDeviceServices> call(Long t) {
