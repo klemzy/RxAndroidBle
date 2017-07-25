@@ -16,8 +16,6 @@ import com.polidea.rxandroidble.internal.RxBleRadioOperation;
 import com.polidea.rxandroidble.internal.connection.BluetoothGattProvider;
 import com.polidea.rxandroidble.internal.connection.RxBleGattCallback;
 
-import java.lang.reflect.Method;
-
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -33,50 +31,12 @@ import static rx.Observable.just;
 
 public class RxBleRadioOperationDisconnect extends RxBleRadioOperation<Void> {
 
-    public static class Builder {
-
-        private final RxBleGattCallback rxBleGattCallback;
-        private final BluetoothGattProvider bluetoothGattProvider;
-        private final String macAddress;
-        private final BluetoothManager bluetoothManager;
-        private final Scheduler mainThreadScheduler;
-        private final TimeoutConfiguration timeoutConfiguration;
-        private boolean refreshCache;
-
-        @Inject
-        public Builder(
-                RxBleGattCallback rxBleGattCallback,
-                BluetoothGattProvider bluetoothGattProvider,
-                @Named(DeviceModule.MAC_ADDRESS) String macAddress,
-                BluetoothManager bluetoothManager,
-                @Named(ClientComponent.NamedSchedulers.MAIN_THREAD) Scheduler mainThreadScheduler,
-                @Named(DeviceModule.DISCONNECT_TIMEOUT) TimeoutConfiguration timeoutConfiguration) {
-            this.rxBleGattCallback = rxBleGattCallback;
-            this.bluetoothGattProvider = bluetoothGattProvider;
-            this.macAddress = macAddress;
-            this.bluetoothManager = bluetoothManager;
-            this.mainThreadScheduler = mainThreadScheduler;
-            this.timeoutConfiguration = timeoutConfiguration;
-        }
-
-        public RxBleRadioOperationDisconnect.Builder setRefreshCache(boolean refreshCache) {
-            this.refreshCache = refreshCache;
-            return this;
-        }
-
-        public RxBleRadioOperationDisconnect build() {
-            return new RxBleRadioOperationDisconnect(rxBleGattCallback, bluetoothGattProvider,
-                    macAddress, bluetoothManager, mainThreadScheduler, timeoutConfiguration, refreshCache);
-        }
-    }
-
     private final RxBleGattCallback rxBleGattCallback;
     private final BluetoothGattProvider bluetoothGattProvider;
     private final String macAddress;
     private final BluetoothManager bluetoothManager;
     private final Scheduler mainThreadScheduler;
     private final TimeoutConfiguration timeoutConfiguration;
-    private boolean refreshCache;
 
     @Inject
     RxBleRadioOperationDisconnect(
@@ -85,15 +45,13 @@ public class RxBleRadioOperationDisconnect extends RxBleRadioOperation<Void> {
             @Named(DeviceModule.MAC_ADDRESS) String macAddress,
             BluetoothManager bluetoothManager,
             @Named(ClientComponent.NamedSchedulers.MAIN_THREAD) Scheduler mainThreadScheduler,
-            @Named(DeviceModule.DISCONNECT_TIMEOUT) TimeoutConfiguration timeoutConfiguration,
-            boolean refreshCache) {
+            @Named(DeviceModule.DISCONNECT_TIMEOUT) TimeoutConfiguration timeoutConfiguration) {
         this.rxBleGattCallback = rxBleGattCallback;
         this.bluetoothGattProvider = bluetoothGattProvider;
         this.macAddress = macAddress;
         this.bluetoothManager = bluetoothManager;
         this.mainThreadScheduler = mainThreadScheduler;
         this.timeoutConfiguration = timeoutConfiguration;
-        this.refreshCache = refreshCache;
     }
 
     @Override
@@ -112,17 +70,17 @@ public class RxBleRadioOperationDisconnect extends RxBleRadioOperation<Void> {
                             new Action1<BluetoothGatt>() {
                                 @Override
                                 public void call(BluetoothGatt bluetoothGatt) {
-                                    if (refreshCache) {
-                                        try {
-                                            Method localMethod = bluetoothGatt.getClass().getMethod("refresh", new Class[0]);
-                                            if (localMethod != null) {
-                                                boolean bool = ((Boolean) localMethod.invoke(bluetoothGatt, new Object[0])).booleanValue();
-                                                RxBleLog.e("Refreshed cache " + bool);
-                                            }
-                                        } catch (Exception localException) {
-                                            RxBleLog.e("An exception occured while refreshing device");
-                                        }
-                                    }
+//                                    if (refreshCache) {
+//                                        try {
+//                                            Method localMethod = bluetoothGatt.getClass().getMethod("refresh", new Class[0]);
+//                                            if (localMethod != null) {
+//                                                boolean bool = ((Boolean) localMethod.invoke(bluetoothGatt, new Object[0])).booleanValue();
+//                                                RxBleLog.e("Refreshed cache " + bool);
+//                                            }
+//                                        } catch (Exception localException) {
+//                                            RxBleLog.e("An exception occured while refreshing device");
+//                                        }
+//                                    }
                                     bluetoothGatt.close();
                                 }
                             },
@@ -146,10 +104,6 @@ public class RxBleRadioOperationDisconnect extends RxBleRadioOperation<Void> {
 
     private boolean isDisconnected(BluetoothGatt bluetoothGatt) {
         return bluetoothManager.getConnectionState(bluetoothGatt.getDevice(), BluetoothProfile.GATT) == BluetoothProfile.STATE_DISCONNECTED;
-    }
-
-    public void setRefreshCache(boolean refreshCache) {
-        this.refreshCache = refreshCache;
     }
 
     /**

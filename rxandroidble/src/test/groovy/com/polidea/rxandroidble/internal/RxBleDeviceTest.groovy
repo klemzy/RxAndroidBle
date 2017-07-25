@@ -72,7 +72,7 @@ public class RxBleDeviceTest extends Specification {
     def "establishConnection() should call RxBleConnection.Connector.prepareConnection() #id"() {
 
         when:
-        rxBleDevice.establishConnection(theAutoConnectValue, false).subscribe()
+        rxBleDevice.establishConnection(theAutoConnectValue).subscribe()
 
         then:
         1 * mockConnector.prepareConnection(theAutoConnectValue) >> connectionStatePublishSubject
@@ -233,7 +233,7 @@ public class RxBleDeviceTest extends Specification {
         subscription.unsubscribe()
 
         when:
-        rxBleDevice.establishConnection(false, false).subscribe(secondSubscriber)
+        rxBleDevice.establishConnection(false).subscribe(secondSubscriber)
 
         then:
         firstSubscriber.assertValueCount 1
@@ -312,7 +312,7 @@ public class RxBleDeviceTest extends Specification {
     }
 
     public Observable<RxBleConnection> rxStartConnecting() {
-        return rxBleDevice.establishConnection(false, false)
+        return rxBleDevice.establishConnection(false)
     }
 
     public void notifyConnectionWasEstablished() {
