@@ -16,6 +16,8 @@ import com.polidea.rxandroidble.internal.RxBleRadioOperation;
 import com.polidea.rxandroidble.internal.connection.BluetoothGattProvider;
 import com.polidea.rxandroidble.internal.connection.RxBleGattCallback;
 
+import java.lang.reflect.Method;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -37,6 +39,8 @@ public class RxBleRadioOperationDisconnect extends RxBleRadioOperation<Void> {
     private final BluetoothManager bluetoothManager;
     private final Scheduler mainThreadScheduler;
     private final TimeoutConfiguration timeoutConfiguration;
+
+    private boolean refreshCacheOnDisconnect;
 
     @Inject
     RxBleRadioOperationDisconnect(
@@ -70,17 +74,17 @@ public class RxBleRadioOperationDisconnect extends RxBleRadioOperation<Void> {
                             new Action1<BluetoothGatt>() {
                                 @Override
                                 public void call(BluetoothGatt bluetoothGatt) {
-//                                    if (refreshCache) {
-//                                        try {
-//                                            Method localMethod = bluetoothGatt.getClass().getMethod("refresh", new Class[0]);
-//                                            if (localMethod != null) {
-//                                                boolean bool = ((Boolean) localMethod.invoke(bluetoothGatt, new Object[0])).booleanValue();
-//                                                RxBleLog.e("Refreshed cache " + bool);
-//                                            }
-//                                        } catch (Exception localException) {
-//                                            RxBleLog.e("An exception occured while refreshing device");
-//                                        }
-//                                    }
+                                    if (refreshCacheOnDisconnect) {
+                                        try {
+                                            Method localMethod = bluetoothGatt.getClass().getMethod("refresh", new Class[0]);
+                                            if (localMethod != null) {
+                                                boolean bool = ((Boolean) localMethod.invoke(bluetoothGatt, new Object[0])).booleanValue();
+                                                RxBleLog.e("Refreshed cache " + bool);
+                                            }
+                                        } catch (Exception localException) {
+                                            RxBleLog.e("An exception occured while refreshing device");
+                                        }
+                                    }
                                     bluetoothGatt.close();
                                 }
                             },
@@ -100,6 +104,10 @@ public class RxBleRadioOperationDisconnect extends RxBleRadioOperation<Void> {
                             }
                     );
         }
+    }
+
+    public void setRefreshCacheOnDisconnect(boolean refreshCacheOnDisconnect) {
+        this.refreshCacheOnDisconnect = refreshCacheOnDisconnect;
     }
 
     private boolean isDisconnected(BluetoothGatt bluetoothGatt) {

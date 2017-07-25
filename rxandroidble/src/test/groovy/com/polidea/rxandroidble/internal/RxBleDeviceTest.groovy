@@ -29,7 +29,7 @@ public class RxBleDeviceTest extends Specification {
     TestSubscriber deviceConnectionStateSubscriber = new TestSubscriber()
 
     def setup() {
-        mockConnector.prepareConnection(_) >> mockConnectorEstablishConnectionPublishSubject
+        mockConnector.prepareConnection(_,_) >> mockConnectorEstablishConnectionPublishSubject
     }
 
     def "should return the BluetoothDevice name"() {
@@ -72,10 +72,10 @@ public class RxBleDeviceTest extends Specification {
     def "establishConnection() should call RxBleConnection.Connector.prepareConnection() #id"() {
 
         when:
-        rxBleDevice.establishConnection(theAutoConnectValue).subscribe()
+        rxBleDevice.establishConnection(theAutoConnectValue, false).subscribe()
 
         then:
-        1 * mockConnector.prepareConnection(theAutoConnectValue) >> connectionStatePublishSubject
+        1 * mockConnector.prepareConnection(theAutoConnectValue, false) >> connectionStatePublishSubject
 
         where:
         theAutoConnectValue << [true, false]
@@ -233,7 +233,7 @@ public class RxBleDeviceTest extends Specification {
         subscription.unsubscribe()
 
         when:
-        rxBleDevice.establishConnection(false).subscribe(secondSubscriber)
+        rxBleDevice.establishConnection(false, false).subscribe(secondSubscriber)
 
         then:
         firstSubscriber.assertValueCount 1
@@ -312,7 +312,7 @@ public class RxBleDeviceTest extends Specification {
     }
 
     public Observable<RxBleConnection> rxStartConnecting() {
-        return rxBleDevice.establishConnection(false)
+        return rxBleDevice.establishConnection(false, false)
     }
 
     public void notifyConnectionWasEstablished() {

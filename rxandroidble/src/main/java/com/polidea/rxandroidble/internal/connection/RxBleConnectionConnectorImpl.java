@@ -47,7 +47,8 @@ public class RxBleConnectionConnectorImpl implements RxBleConnection.Connector {
     }
 
     @Override
-    public Observable<RxBleConnection> prepareConnection(final boolean autoConnect) {
+    public Observable<RxBleConnection> prepareConnection(final boolean autoConnect,
+                                                         final boolean refreshCacheOnDisconnect) {
         return Observable.defer(new Func0<Observable<RxBleConnection>>() {
             @Override
             public Observable<RxBleConnection> call() {
@@ -71,14 +72,15 @@ public class RxBleConnectionConnectorImpl implements RxBleConnection.Connector {
                                 );
                             }
                         })
-                        .doOnUnsubscribe(disconnect(connectionComponent.disconnectOperation()));
+                        .doOnUnsubscribe(disconnect(connectionComponent.disconnectOperation(), refreshCacheOnDisconnect));
             }
 
             @NonNull
-            private Action0 disconnect(final RxBleRadioOperationDisconnect operationDisconnect) {
+            private Action0 disconnect(final RxBleRadioOperationDisconnect operationDisconnect, final boolean refreshCacheOnDisconnect) {
                 return new Action0() {
                     @Override
                     public void call() {
+                        operationDisconnect.setRefreshCacheOnDisconnect(refreshCacheOnDisconnect);
                         enqueueDisconnectOperation(operationDisconnect);
                     }
                 };
