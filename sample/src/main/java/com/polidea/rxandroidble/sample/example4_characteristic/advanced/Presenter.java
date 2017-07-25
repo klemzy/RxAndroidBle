@@ -1,15 +1,19 @@
 package com.polidea.rxandroidble.sample.example4_characteristic.advanced;
 
 
-import static android.bluetooth.BluetoothGattCharacteristic.PROPERTY_INDICATE;
-import static android.bluetooth.BluetoothGattCharacteristic.PROPERTY_NOTIFY;
-
+import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.support.annotation.NonNull;
+
 import com.polidea.rxandroidble.NotificationSetupMode;
 import com.polidea.rxandroidble.RxBleDevice;
+
 import java.util.UUID;
+
 import rx.Observable;
+
+import static android.bluetooth.BluetoothGattCharacteristic.PROPERTY_INDICATE;
+import static android.bluetooth.BluetoothGattCharacteristic.PROPERTY_NOTIFY;
 
 /**
  * Presenter class for {@link AdvancedCharacteristicOperationExampleActivity}. Prepares the logic for the activity using passed
@@ -44,7 +48,7 @@ final class Presenter {
     ) {
 
         return connectClicks.take(1) // subscribe to connectClicks and take one (unsubscribe after)
-                .flatMap(connectClick -> rxBleDevice.establishConnection(false) // on click start connecting
+                .flatMap(connectClick -> rxBleDevice.establishConnection(false, false, BluetoothGatt.CONNECTION_PRIORITY_BALANCED) // on click start connecting
                         .flatMap(
                                 connection -> connection
                                         .discoverServices() // when connected discover services

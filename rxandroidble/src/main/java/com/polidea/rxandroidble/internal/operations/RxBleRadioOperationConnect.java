@@ -3,7 +3,6 @@ package com.polidea.rxandroidble.internal.operations;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGatt;
 import android.os.Build;
-import android.os.Build;
 import android.os.DeadObjectException;
 import android.support.annotation.NonNull;
 
@@ -83,7 +82,7 @@ public class RxBleRadioOperationConnect extends RxBleRadioOperation<BluetoothGat
     private final BluetoothGattProvider bluetoothGattProvider;
     private final TimeoutConfiguration connectTimeout;
     private final boolean autoConnect;
-    private final int connectionPriority;\
+    private final int connectionPriority;
 
     @Inject
     RxBleRadioOperationConnect(

@@ -30,7 +30,7 @@ public class MockConnectionComponentBuilder implements ConnectionComponent.Build
             }
 
             @Override
-            RxBleRadioOperationDisconnect disconnectOperation() {
+            RxBleRadioOperationDisconnect.Builder disconnectOperationBuilder() {
                 return rxBleRadioOperationDisconnect
             }
 
