@@ -20,8 +20,8 @@ import com.polidea.rxandroidble.internal.RxBleRadio;
 import com.polidea.rxandroidble.internal.RxBleRadioOperation;
 import com.polidea.rxandroidble.internal.operations.OperationsProvider;
 import com.polidea.rxandroidble.internal.util.ByteAssociation;
-
 import com.polidea.rxandroidble.internal.util.RadioReleasingEmitterWrapper;
+
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
@@ -50,6 +50,7 @@ public class RxBleConnectionImpl implements RxBleConnection {
     private final DescriptorWriter descriptorWriter;
 
     private int currentMtu = GATT_MTU_MINIMUM; // Default value at the beginning
+
 
     @Inject
     public RxBleConnectionImpl(
@@ -333,4 +334,10 @@ public class RxBleConnectionImpl implements RxBleConnection {
             }
         });
     }
+
+    @Override
+    public void addDelayPriorDiscoverServices(long delay, TimeUnit timeUnit) {
+        serviceDiscoveryManager.addDelayPriorDiscoverServices(delay, timeUnit);
+    }
+
 }

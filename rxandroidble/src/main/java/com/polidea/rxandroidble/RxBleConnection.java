@@ -536,4 +536,6 @@ public interface RxBleConnection {
      */
     <T> Observable<T> queue(@NonNull RxBleRadioOperationCustom<T> operation);
 
+    void addDelayPriorDiscoverServices(long delay, TimeUnit timeUnit);
+
 }

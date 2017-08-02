@@ -4,14 +4,18 @@ package com.polidea.rxandroidble.internal.connection;
 import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattService;
 import android.support.annotation.NonNull;
+
 import com.polidea.rxandroidble.RxBleDeviceServices;
 import com.polidea.rxandroidble.internal.RxBleRadio;
 import com.polidea.rxandroidble.internal.operations.OperationsProvider;
 import com.polidea.rxandroidble.internal.operations.RxBleRadioOperationServicesDiscover;
 import com.polidea.rxandroidble.internal.operations.TimeoutConfiguration;
+
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+
 import javax.inject.Inject;
+
 import rx.Observable;
 import rx.functions.Action0;
 import rx.functions.Action1;
@@ -31,6 +35,11 @@ class ServiceDiscoveryManager {
     private SerializedSubject<TimeoutConfiguration, TimeoutConfiguration> timeoutBehaviorSubject
             = BehaviorSubject.<TimeoutConfiguration>create().toSerialized();
     private boolean hasCachedResults = false;
+
+    private long delay = 0;
+    private TimeUnit timeUnit;
+    private boolean addDelay = false;
+
 
     @Inject
     ServiceDiscoveryManager(RxBleRadio rxBleRadio, BluetoothGatt bluetoothGatt, OperationsProvider operationProvider) {
@@ -102,8 +111,23 @@ class ServiceDiscoveryManager {
             public Observable<RxBleDeviceServices> call(TimeoutConfiguration timeoutConf) {
                 final RxBleRadioOperationServicesDiscover operation = operationProvider
                         .provideServiceDiscoveryOperation(timeoutConf.timeout, timeoutConf.timeoutTimeUnit);
-                return rxBleRadio.queue(operation);
+                if (addDelay) {
+                    return Observable.timer(delay, timeUnit).flatMap(new Func1<Long, Observable<RxBleDeviceServices>>() {
+                        @Override
+                        public Observable<RxBleDeviceServices> call(Long aLong) {
+                            return rxBleRadio.queue(operation);
+                        }
+                    });
+                } else {
+                    return rxBleRadio.queue(operation);
+                }
             }
         };
+    }
+
+    public void addDelayPriorDiscoverServices(long delay, TimeUnit timeUnit) {
+        addDelay = true;
+        this.delay = delay;
+        this.timeUnit = timeUnit;
     }
 }
