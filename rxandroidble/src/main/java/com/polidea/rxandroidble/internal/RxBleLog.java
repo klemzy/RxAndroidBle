@@ -119,10 +119,6 @@ public class RxBleLog {
     }
 
     private static void throwShade(int priority, Throwable t, String message, Object... args) {
-        if (priority < logLevel) {
-            return;
-        }
-
         final String formattedMessage = formatString(message, args);
         final String finalMessage;
 
@@ -145,7 +141,10 @@ public class RxBleLog {
 
     private static void println(int priority, String tag, String message) {
         if (message.length() < 4000) {
-            Log.println(priority, tag, message);
+            if (priority < logLevel) {
+                Log.println(priority, tag, message);
+            }
+
             if (logDestination != null) {
                 writeToFile(logDestination, String.format(Locale.getDefault(), "%s %s", tag, message));
             }
@@ -155,7 +154,10 @@ public class RxBleLog {
             // longer than 4000 characters: we're explicitly ignoring this case here.
             String[] lines = message.split("\n");
             for (String line : lines) {
-                Log.println(priority, tag, line);
+                if (priority < logLevel) {
+                    Log.println(priority, tag, line);
+                }
+
                 if (logDestination != null) {
                     writeToFile(logDestination, String.format(Locale.getDefault(), "%s %s", tag, line));
                 }
