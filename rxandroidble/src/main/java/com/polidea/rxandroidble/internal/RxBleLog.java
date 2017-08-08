@@ -141,7 +141,7 @@ public class RxBleLog {
 
     private static void println(int priority, String tag, String message) {
         if (message.length() < 4000) {
-            if (priority < logLevel) {
+            if (!(priority < logLevel)) {
                 Log.println(priority, tag, message);
             }
 
@@ -154,7 +154,7 @@ public class RxBleLog {
             // longer than 4000 characters: we're explicitly ignoring this case here.
             String[] lines = message.split("\n");
             for (String line : lines) {
-                if (priority < logLevel) {
+                if (!(priority < logLevel)) {
                     Log.println(priority, tag, line);
                 }
 
