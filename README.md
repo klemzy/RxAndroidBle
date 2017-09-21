@@ -251,6 +251,11 @@ For connection debugging you can use extended logging
 RxBleClient.setLogLevel(RxBleLog.DEBUG);
 ```
 
+By default `RxBleLog` uses logcat to print the messages. You can provide your own logger implementation to forward it to other logging libraries such as Timber.
+```java
+RxBleLog.setLogger((level, tag, msg) -> Timber.tag(tag).log(level, msg));
+```
+
 ### Error handling
 Every error you may encounter is provided via onError callback. Each public method has JavaDoc explaining possible errors.
 
@@ -317,7 +322,7 @@ Complete usage examples are located in `/sample` [GitHub repo](https://github.co
 ### Gradle
 
 ```groovy
-compile "com.polidea.rxandroidble:rxandroidble:1.3.3"
+compile "com.polidea.rxandroidble:rxandroidble:1.4.1"
 ```
 ### Maven
 
@@ -325,7 +330,7 @@ compile "com.polidea.rxandroidble:rxandroidble:1.3.3"
 <dependency>
   <groupId>com.polidea.rxandroidble</groupId>
   <artifactId>rxandroidble</artifactId>
-  <version>1.3.3</version>
+  <version>1.4.1</version>
   <type>aar</type>
 </dependency>
 ```
@@ -347,6 +352,10 @@ Note: Using MockRxAndroidBle in unit tests needs [Robolectric](https://github.co
 If you would like to contribute code you can do so through GitHub by forking the repository and sending a pull request.
 
 When submitting code, please make every effort to follow existing conventions and style in order to keep the code as readable as possible. Please also make sure your code compiles by running ```./gradlew clean checkstyle test```.
+
+## Support
+* non-commercial — head to [StackOverflow #rxandroidble](https://stackoverflow.com/questions/tagged/rxandroidble)
+* commercial — drop an email to hello@polidea.com for more info
 
 ## Maintainers
 * Dariusz Seweryn (dariusz.seweryn@polidea.com)

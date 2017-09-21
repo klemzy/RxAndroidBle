@@ -1,6 +1,23 @@
 Change Log
 ==========
 
+Version 1.4.1
+* Fixed issue hasObservers conditional for Output class (https://github.com/Polidea/RxAndroidBle/issues/283)
+
+Version 1.4.0
+* Added native callback usage support in custom operations. You may consider this API if your implementation is performance critical. (https://github.com/Polidea/RxAndroidBle/issues/165)
+* Added pre-scan verification for excessive scan (undocumented Android 7.0 "feature") (https://github.com/Polidea/RxAndroidBle/issues/227)
+* Adjusted `BleCannotSetCharacteristicNotificationException` to contain the cause exception if available. `RxBleConnection.setupNotification()`/`RxBleConnection.setupIndication()` will now throw the cause of disconnection if subscribed after connection was disconnected. (https://github.com/Polidea/RxAndroidBle/issues/225) 
+* _Changed Behaviour_ of `RxBleDevice.observeConnectionStateChanges()` - does not emit initial state and reflects best `BluetoothGatt` state. (https://github.com/Polidea/RxAndroidBle/issues/50)
+* Added support for a custom Logger `RxBleLog.setLogger(Logger)` as alternative to Logcat (https://github.com/Polidea/RxAndroidBle/pull/248)
+* Added a warning log if user tries to use a characteristic against it's properties (https://github.com/Polidea/RxAndroidBle/issues/224)
+* _Changed Behaviour_ — `BluetoothGatt` is now called on a single background thread instead of the main thread (https://github.com/Polidea/RxAndroidBle/pull/255)
+* Decoupled command queues for different connections. (https://github.com/Polidea/RxAndroidBle/issues/250)
+
+Version 1.3.4
+* Added @Nullable annotation to `RxBleDevice.getName()`. (https://github.com/Polidea/RxAndroidBle/issues/263)
+* Fixed connection not being disconnected when `DeadObjectException` was raised. (https://github.com/Polidea/RxAndroidBle/issues/275)
+
 Version 1.3.3
 * Fixed scan filtering by name on API <21 (https://github.com/Polidea/RxAndroidBle/pull/243)
 * Fixed race condition (which would cause the library to hang) when using `.first()` on calls to `RxBleConnection` that emit a single result. (https://github.com/Polidea/RxAndroidBle/issues/244) 
